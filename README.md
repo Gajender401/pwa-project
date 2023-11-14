@@ -1,7 +1,9 @@
+# Mobile view only
+
+### added onClick on threedots icon and clip icon
 
 ## Getting Started
 
-## mobile view only
 
 First, run the development server:
 
