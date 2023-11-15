@@ -52,21 +52,48 @@ const ChatPage: React.FC = () => {
   const [isTabOpen, setIsTabOpen] = useState(false);
   const tabRef = useRef<HTMLDivElement>(null);
 
+  const [page, setPage] = useState(0); // Track the current page for infinite scroll
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://qa.corider.in/assignment/chat?page=0');
+        setIsLoading(true);
+        const response = await axios.get(`https://qa.corider.in/assignment/chat?page=${page}`);
         const newData: Chat[] = response.data.chats;
 
-        setChats(newData);
+        setChats((prevChats) => [...prevChats, ...newData]);
+        setPage((prevPage) => prevPage + 1);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []); // Empty dependency array ensures the effect runs once on mount
+  }, [page]); // Trigger the effect when the page changes
 
+  const handleScroll = () => {
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+
+    if (scrollHeight - scrollTop === clientHeight && !isLoading) {
+      // User has scrolled to the bottom, load more data
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    // Attach a scroll event listener to the document to handle infinite scroll
+    document.addEventListener('scroll', handleScroll);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener('scroll', handleScroll);
+    };
+  }, [isLoading]);
   const groupedChats = groupChatsByDate(chats);
 
   const handleMenuToggle = () => {

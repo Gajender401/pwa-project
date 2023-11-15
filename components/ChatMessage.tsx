@@ -21,7 +21,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sender }) => {
 
   return (
     <div className={`flex text-xs ${isSelfMessage ? 'justify-end' : 'justify-start mr-5'} items-start  space-x-2 mb-4`}>
-      {!isSelfMessage && <img className="rounded-full h-8 w-8" src={sender.image} alt={sender.user_id} />}
+      {!isSelfMessage && 
+      <div className='relative min-w-fit ' >
+        <img className='absolute w-3 bottom-0 right-0' src="/check-verified.svg" alt="check" />
+        <img className="rounded-full h-8 w-8" src={sender.image} alt={sender.user_id} />
+      </div>
+      }
       <div
         className={`p-2 shadow-md ${
           isSelfMessage
